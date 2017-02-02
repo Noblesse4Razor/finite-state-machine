@@ -13,19 +13,20 @@ class FSM {
             {
                 past : new Array(),
                 future: new Array(),
-                current :0,
+                current : this.condition,
                 newState: function (key) {
-                    this.past[this.current++]=key;
+                    this.past.push(key);
 
                 },
                 get undo() {
                     let temp;
-                    this.future.push(temp=this.past.pop());
-                    return this.future[this.future.length];
+                    this.future.push(this.current);
+                    return this.past.pop();
                 },
                 get redo() {
-                    this.current++;
-                    return this.past[this.current];
+                    let temp;
+                    this.past.push(temp=this.future.pop());
+                    return temp;
                 }
             }
     }
@@ -61,7 +62,8 @@ class FSM {
      * Resets FSM state to initial.
      */
     reset() {
-        this.history = new Array();
+        this.history.past = this.history.future =  new Array();
+
         this.condition=this.defaultState;
     }
 
@@ -87,8 +89,8 @@ class FSM {
      * @returns {Boolean}
      */
     undo() {
-        if(this.condition==this.defaultState && this.history.current==0) return false;
-        this.changeState(this.history.undo);
+        if(!this.history.past.length) return false;
+        this.condition=this.history.undo;
         return true;
     }
 
@@ -98,7 +100,7 @@ class FSM {
      * @returns {Boolean}
      */
     redo() {
-        if(this.condition==this.defaultState && !this.history.length) return false;
+        if(!this.history.future.length) return false;
         this.condition=this.history.redo;
         return true;
     }
@@ -106,7 +108,9 @@ class FSM {
     /**
      * Clears transition history
      */
-    clearHistory() {}
+    clearHistory() {
+        this.history.future = this.history.past = new Array();
+    }
 }
 
 module.exports = FSM;
