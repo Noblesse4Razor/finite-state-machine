@@ -18,9 +18,11 @@ class FSM {
                     this.past.push(key);
 
                 },
-                get undo() {
-                    let temp;
-                    this.future.push(this.current);
+                set undo(current) {
+                    this.future.push(current);
+
+                },
+                get undo(){
                     return this.past.pop();
                 },
                 get redo() {
@@ -47,6 +49,7 @@ class FSM {
         if(!(state in this.states)) throw error;
         this.history.newState(this.condition);
         this.condition = state;
+        this.history.future =new Array();
     }
 
     /**
@@ -56,6 +59,7 @@ class FSM {
     trigger(event) {
         if(!(event in this.states[this.condition].transitions)) throw error;
         this.changeState(this.states[this.condition].transitions[event]);
+        this.history.future =new Array();
     }
 
     /**
@@ -90,7 +94,9 @@ class FSM {
      */
     undo() {
         if(!this.history.past.length) return false;
+        this.history.undo=this.condition;
         this.condition=this.history.undo;
+
         return true;
     }
 
