@@ -1,4 +1,32 @@
-class FSM {
+class Node{
+    constructor(data,el)
+    {
+        this.data = data;
+        this.next = el;
+    }
+}
+
+class Stack {
+    constructor() {
+        this.head = null;
+    }
+
+    isEmpty() {
+        return this.head === null;
+    }
+
+    push(data) {
+        this.head = new Node(data, this.head);
+    }
+
+    pop() {
+        let item = this.head.data;
+        this.head = this.head.next;
+        return item;
+    }
+}
+
+    class FSM {
     /**
      * Creates new FSM instance.
      * @param config
@@ -11,8 +39,8 @@ class FSM {
 
         this.history =
             {
-                past : new Array(),
-                future: new Array(),
+                past : new Stack(), // new Array is 2ez
+                future: new Stack(),
                 current : this.condition,
                 newState: function (key) {
                     this.past.push(key);
@@ -49,7 +77,7 @@ class FSM {
         if(!(state in this.states)) throw error;
         this.history.newState(this.condition);
         this.condition = state;
-        this.history.future =new Array();
+        this.history.future =new Stack();
     }
 
     /**
@@ -59,14 +87,14 @@ class FSM {
     trigger(event) {
         if(!(event in this.states[this.condition].transitions)) throw error;
         this.changeState(this.states[this.condition].transitions[event]);
-        this.history.future =new Array();
+        this.history.future =new Stack();
     }
 
     /**
      * Resets FSM state to initial.
      */
     reset() {
-        this.history.past = this.history.future =  new Array();
+        this.history.past = this.history.future =  new Stack();
 
         this.condition=this.defaultState;
     }
@@ -93,7 +121,7 @@ class FSM {
      * @returns {Boolean}
      */
     undo() {
-        if(!this.history.past.length) return false;
+        if(this.history.past.isEmpty()) return false;
         this.history.undo=this.condition;
         this.condition=this.history.undo;
 
@@ -106,7 +134,7 @@ class FSM {
      * @returns {Boolean}
      */
     redo() {
-        if(!this.history.future.length) return false;
+        if(this.history.future.isEmpty()) return false;
         this.condition=this.history.redo;
         return true;
     }
@@ -115,7 +143,7 @@ class FSM {
      * Clears transition history
      */
     clearHistory() {
-        this.history.future = this.history.past = new Array();
+        this.history.future = this.history.past = new Stack();
     }
 }
 
