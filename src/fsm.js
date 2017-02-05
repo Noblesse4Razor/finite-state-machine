@@ -1,6 +1,5 @@
-class Node{
-    constructor(data,el)
-    {
+class Node {
+    constructor(data, el) {
         this.data = data;
         this.next = el;
     }
@@ -26,7 +25,7 @@ class Stack {
     }
 }
 
-    class FSM {
+class FSM {
     /**
      * Creates new FSM instance.
      * @param config
@@ -34,14 +33,14 @@ class Stack {
     constructor(config) {
         if (config === null || config === undefined) throw error;
         this.condition = config.initial;
-        this.states=config.states;
-        this.defaultState=config.initial;
+        this.states = config.states;
+        this.defaultState = config.initial;
 
         this.history =
             {
-                past : new Stack(), // new Array is 2ez
+                past: new Stack(), //  Array is 2ez
                 future: new Stack(),
-                current : this.condition,
+                current: this.condition,
                 newState: function (key) {
                     this.past.push(key);
 
@@ -50,12 +49,12 @@ class Stack {
                     this.future.push(current);
 
                 },
-                get undo(){
+                get undo() {
                     return this.past.pop();
                 },
                 get redo() {
                     let temp;
-                    this.past.push(temp=this.future.pop());
+                    this.past.push(temp = this.future.pop());
                     return temp;
                 }
             }
@@ -74,10 +73,10 @@ class Stack {
      * @param state
      */
     changeState(state) {
-        if(!(state in this.states)) throw error;
+        if (!(state in this.states)) throw error;
         this.history.newState(this.condition);
         this.condition = state;
-        this.history.future =new Stack();
+        this.history.future = new Stack();
     }
 
     /**
@@ -85,18 +84,16 @@ class Stack {
      * @param event
      */
     trigger(event) {
-        if(!(event in this.states[this.condition].transitions)) throw error;
+        if (!(event in this.states[this.condition].transitions)) throw error;
         this.changeState(this.states[this.condition].transitions[event]);
-        this.history.future =new Stack();
     }
 
     /**
      * Resets FSM state to initial.
      */
     reset() {
-        this.history.past = this.history.future =  new Stack();
-
-        this.condition=this.defaultState;
+        this.history.past = this.history.future = new Stack();
+        this.condition = this.defaultState;
     }
 
     /**
@@ -106,24 +103,24 @@ class Stack {
      * @returns {Array}
      */
     getStates(event) {
-        if(event===undefined) return Object.getOwnPropertyNames(this.states);
+        if (event === undefined) return Object.getOwnPropertyNames(this.states);
         let output = new Array();
 
-        for (let key in this.states)
-        {
-            if(event in this.states[key].transitions) output.push(key);
+        for (let key in this.states) {
+            if (event in this.states[key].transitions) output.push(key);
         }
         return output;
     }
+
     /**
      * Goes back to previous state.
      * Returns false if undo is not available.
      * @returns {Boolean}
      */
     undo() {
-        if(this.history.past.isEmpty()) return false;
-        this.history.undo=this.condition;
-        this.condition=this.history.undo;
+        if (this.history.past.isEmpty()) return false;
+        this.history.undo = this.condition;
+        this.condition = this.history.undo;
 
         return true;
     }
@@ -134,8 +131,8 @@ class Stack {
      * @returns {Boolean}
      */
     redo() {
-        if(this.history.future.isEmpty()) return false;
-        this.condition=this.history.redo;
+        if (this.history.future.isEmpty()) return false;
+        this.condition = this.history.redo;
         return true;
     }
 
@@ -149,4 +146,5 @@ class Stack {
 
 module.exports = FSM;
 
-/** @Created by Uladzimir Halushka **/
+/** @Created by Uladzimir Halushka
+ *  @Implemented by Leonchyk Vlad **/
